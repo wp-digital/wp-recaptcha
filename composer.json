@@ -1,21 +1,18 @@
 {
-    "name": "shtrihstr/wp-recaptcha",
-    "description": "",
-    "type": "wordpress-muplugin",
-    "keywords": ["wordpress", "plugins", "captcha", "recaptcha"],
-    "license": "GPL-2.0",
-    "authors": [
-        {
-            "name": "Oleksandr Strikha",
-            "email": "alex@strikha.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "require": {
-        "php": ">=5.5.0",
-        "composer/installers": "~1.0"
-    },
-    "extra": {
-        "installer-name": "recaptcha"
+  "name": "innocode-digital/wp-recaptcha",
+  "version": "2.0.0",
+  "type": "wordpress-muplugin",
+  "license": "GPL-2.0+",
+  "require": {
+    "php": ">=7.1",
+    "composer/installers": "~1.0",
+    "google/recaptcha": "^1.2",
+    "vectorface/whip": "^0.3.2"
+  },
+  "description": "",
+  "autoload": {
+    "psr-4": {
+      "Innocode\\ReCaptcha\\": "src/"
     }
+  }
 }

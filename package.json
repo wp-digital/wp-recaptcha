@@ -1,0 +1,32 @@
+{
+  "name": "wp-recaptcha",
+  "version": "2.0.0",
+  "description": "Change all static files URLs to CDN domain.",
+  "scripts": {
+    "build": "uglifyjs ./public/js/login.js -c -o ./public/js/login.min.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/innocode-digital/wp-recaptcha.git"
+  },
+  "author": {
+    "name": "Innocode",
+    "email": "post@innocode.no",
+    "homepage": "https://innocode.com/"
+  },
+  "contributors": [
+    {
+      "name": "Viktor Kuliebiakin",
+      "email": "kuliebiakin@gmail.com"
+    }
+  ],
+  "license": "GPL-2.0-or-later",
+  "bugs": {
+    "url": "https://github.com/innocode-digital/wp-recaptcha/issues"
+  },
+  "homepage": "https://github.com/innocode-digital/wp-recaptcha#readme",
+  "devDependencies": {
+    "uglify-js": "^3.6.8"
+  }
+}
