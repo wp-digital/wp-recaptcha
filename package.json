@@ -1,7 +1,7 @@
 {
   "name": "wp-recaptcha",
   "version": "2.0.0",
-  "description": "Change all static files URLs to CDN domain.",
+  "description": "Helps to protect website with Google reCAPTCHA v3.",
   "scripts": {
     "build": "uglifyjs ./public/js/login.js -c -o ./public/js/login.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"

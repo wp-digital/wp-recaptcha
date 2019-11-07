@@ -9,7 +9,7 @@
     "google/recaptcha": "^1.2",
     "vectorface/whip": "^0.3.2"
   },
-  "description": "",
+  "description": "Helps to protect website with Google reCAPTCHA v3.",
   "autoload": {
     "psr-4": {
       "Innocode\\ReCaptcha\\": "src/"

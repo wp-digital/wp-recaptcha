@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: reCAPTCHA
- * Description: Change all static files URLs to CDN domain.
+ * Description: Helps to protect website with Google reCAPTCHA v3.
  * Version: 2.0.0
  * Author: Innocode
  * Author URI: https://innocode.com
