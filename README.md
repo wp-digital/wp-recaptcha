@@ -72,6 +72,8 @@ add_filter( 'innocode_recaptcha_retrieve_verification_code_message', function ( 
 
 ### Advanced Usage
 
+#### Login form
+
 It's possible to use ReCAPTCHA on custom rendered login forms with
 [wp_login_form()](https://developer.wordpress.org/reference/functions/wp_login_form/):
 
@@ -89,6 +91,8 @@ add_action( 'innocode_recaptcha_login_forms_ids', function ( $ids ) {
     return $ids;
 } );
 ````
+
+#### Custom actions
 
 It's possible to use ReCAPTCHA on custom forms:
 
