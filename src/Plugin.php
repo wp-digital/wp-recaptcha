@@ -51,7 +51,17 @@ final class Plugin
         $this->_secret = defined( 'RECAPTCHA_SECRET' ) ? RECAPTCHA_SECRET : '';
         $this->_recaptcha = new ReCaptcha( $this->_secret );
         $this->_whip = new Whip();
-        $this->_actions[] = new LoginFormAction();
+
+        $this->add_action( 'login', new LoginFormAction() );
+    }
+
+    /**
+     * @param string         $handle
+     * @param AbstractAction $action
+     */
+    public function add_action( string $handle, AbstractAction $action )
+    {
+        $this->_actions[ $handle ] = $action;
     }
 
     public function run()

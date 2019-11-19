@@ -136,10 +136,10 @@ class LoginFormAction extends AbstractAction
      */
     public function get_forms_ids() : array
     {
-        return [
+        return apply_filters( 'innocode_recaptcha_login_forms_ids', [
             'loginform',
             'lostpasswordform',
-        ];
+        ] );
     }
 
     /**
