@@ -2,7 +2,7 @@
 /**
  * Plugin Name: reCAPTCHA
  * Description: Helps to protect website with Google reCAPTCHA v3.
- * Version: 2.1.0
+ * Version: 2.2.0
  * Author: Innocode
  * Author URI: https://innocode.com
  * Tested up to: 5.3.0
@@ -12,7 +12,7 @@
 
 use Innocode\ReCaptcha;
 
-define( 'INNOCODE_WP_RECAPTCHA_VERSION', '2.1.0' );
+define( 'INNOCODE_WP_RECAPTCHA_VERSION', '2.2.0' );
 define( 'INNOCODE_WP_RECAPTCHA_FILE', __FILE__ );
 
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {

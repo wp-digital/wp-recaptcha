@@ -82,6 +82,7 @@ class LoginFormAction extends AbstractAction
         add_action( 'login_form_verification', [ $this, 'verification_action' ] );
         add_action( 'wp_login_errors', [ $this, 'add_verification_errors' ] );
         add_filter( 'login_body_class', [ $this, 'add_body_classes' ], 10, 2 );
+        add_action( 'wp_login', [ $this, 'delete_verification_code' ], 10, 2 );
     }
 
     /**
@@ -437,5 +438,14 @@ class LoginFormAction extends AbstractAction
         $classes[] = 'innocode_recaptcha_loading';
 
         return $classes;
+    }
+
+    /**
+     * @param string  $user_login
+     * @param WP_User $user
+     */
+    public function delete_verification_code( string $user_login, WP_User $user )
+    {
+        Helpers::delete_user_verification_code( $user->ID );
     }
 }
