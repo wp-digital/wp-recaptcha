@@ -114,3 +114,21 @@ add_action( 'init', function () {
     innocode_recaptcha()->add_action( 'example', new ExampleFormAction() );
 }, 1 );
 ````
+
+#### Allowed IPs
+
+It's possible to add Allowed IPs which will pass ReCAPTCHA with any score:
+
+1. Add the IPs list by defining PHP constant (string with IPs separated by coma)
+````
+define( 'INNOCODE_WP_RECAPTCHA_ALLOWED_IPS', '192.168.0.0,192.168.0.1' );
+````
+
+2. Add the IPs list in admin panel into textarea (one IP per row) at **Admin -> Settings -> Recaptcha**
+
+3. Fetch IPs from Cloudflare Access rules API. Cloudflare API config required:
+````
+define( 'RECAPTCHA_CLOUDFLARE_ZONE_ID', 'YOUR_CLOUDFLARE_ZONE_ID' );
+define( 'RECAPTCHA_CLOUDFLARE_API_KEY', 'YOUR_CLOUDFLARE_API_KEY' );
+define( 'RECAPTCHA_CLOUDFLARE_EMAIL', 'your-cloudflare@email.com' );
+````

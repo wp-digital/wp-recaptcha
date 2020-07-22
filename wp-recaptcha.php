@@ -11,9 +11,9 @@
  */
 
 use Innocode\ReCaptcha;
-
 define( 'INNOCODE_WP_RECAPTCHA_VERSION', '2.2.0' );
 define( 'INNOCODE_WP_RECAPTCHA_FILE', __FILE__ );
+define( 'INNOCODE_WP_RECAPTCHA', 'innocode_wp_recaptcha' );
 
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
     require_once __DIR__ . '/vendor/autoload.php';
@@ -50,3 +50,6 @@ if ( ! function_exists( 'innocode_recaptcha' ) ) {
         return $innocode_recaptcha;
     }
 }
+
+$x=new ReCaptcha\AllowedIPListSources\CloudFlareIPList();
+$x->get_allowed_ips();

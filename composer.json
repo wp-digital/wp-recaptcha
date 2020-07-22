@@ -7,7 +7,8 @@
     "php": ">=7.1",
     "composer/installers": "~1.0",
     "google/recaptcha": "^1.2",
-    "vectorface/whip": "^0.3.2"
+    "vectorface/whip": "^0.3.2",
+    "cloudflare/sdk": "^1.1"
   },
   "description": "Helps to protect website with Google reCAPTCHA v3.",
   "autoload": {
