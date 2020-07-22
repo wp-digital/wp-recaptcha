@@ -81,7 +81,7 @@ class OptionsIPList extends AbstractAllowIPList {
 		$options_page = $this->get_options_page();
 		$sections     = $options_page->get_sections();
 
-		$setting = new Setting( $this->_get_ips_option_name(), __( 'Allowed Ips', 'innocode-instagram' ) );
+		$setting = new Setting( $this->_get_ips_option_name(), __( 'Allowed Ips', 'innocode-recaptcha' ) );
 		$field   = new Field();
 		$field->set_type( 'textarea' );
 		$field->set_description( 'add one IP per row' );
