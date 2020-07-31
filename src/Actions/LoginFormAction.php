@@ -37,7 +37,7 @@ class LoginFormAction extends AbstractAction
      */
     public function get_threshold() : float
     {
-        return 0.99;
+        return 0.5;
     }
 
     /**
