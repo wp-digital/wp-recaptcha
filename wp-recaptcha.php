@@ -51,5 +51,3 @@ if ( ! function_exists( 'innocode_recaptcha' ) ) {
     }
 }
 
-$x=new ReCaptcha\AllowedIPListSources\CloudFlareIPList();
-$x->get_allowed_ips();
