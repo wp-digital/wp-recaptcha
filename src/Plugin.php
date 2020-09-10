@@ -5,6 +5,8 @@ namespace Innocode\ReCaptcha;
 use Innocode\ReCaptcha\Abstracts\AbstractAction;
 use Innocode\ReCaptcha\Abstracts\AbstractAllowIPList;
 use Innocode\ReCaptcha\Actions\LoginFormAction;
+use Innocode\ReCaptcha\Admin\PluginSettings;
+use Innocode\ReCaptcha\Admin\Section;
 use Innocode\ReCaptcha\AllowedIPListSources\CloudFlareIPList;
 use Innocode\ReCaptcha\AllowedIPListSources\ConfigConstantIPList;
 use Innocode\ReCaptcha\AllowedIPListSources\OptionsIPList;
@@ -40,10 +42,6 @@ final class Plugin {
 	 * @var AbstractAction[]
 	 */
 	private $_actions = [];
-	/**
-	 * @var AbstractAllowIPList[]
-	 */
-	private $_allowed_ip_lists = [];
 
 
 	/**
@@ -63,11 +61,9 @@ final class Plugin {
 		$this->_secret    = defined( 'RECAPTCHA_SECRET' ) ? RECAPTCHA_SECRET : '';
 		$this->_recaptcha = new ReCaptcha( $this->_secret );
 		$this->_whip      = new Whip();
+		new PluginSettings();
 
 		$this->add_action( 'login', new LoginFormAction() );
-		$this->add_allowed_ip_list( 'options', new OptionsIPList() );
-		$this->add_allowed_ip_list( 'constant', new ConfigConstantIPList() );
-		$this->add_allowed_ip_list( 'cloudflare', new CloudFlareIPList() );
 	}
 
 	/**
@@ -78,18 +74,9 @@ final class Plugin {
 		$this->_actions[ $handle ] = $action;
 	}
 
-	/**
-	 * @param $handle
-	 * @param AbstractAllowIPList $ip_list
-	 */
-	public function add_allowed_ip_list( $handle, AbstractAllowIPList $ip_list ) {
-		$this->_allowed_ip_lists[ $handle ] = $ip_list;
-	}
-
 
 	public function run() {
 		$actions                 = $this->get_actions();
-		$ip_lists                = $this->get_ip_lists();
 		$enqueue_scripts_actions = array_unique(
 			array_reduce(
 				$actions,
@@ -121,9 +108,8 @@ final class Plugin {
 			$action->init();
 		}
 
-		foreach ( $ip_lists as $ip_list ) {
-			$this->add_allowed_ips( $ip_list->get_allowed_ips() );
-		}
+		$this->_fetch_ip_lists();
+
 	}
 
 	/**
@@ -131,6 +117,39 @@ final class Plugin {
 	 */
 	public function get_api_script_url(): string {
 		return add_query_arg( 'render', $this->get_key(), $this->_api_script_url );
+	}
+
+	protected function _fetch_ip_lists(){
+		if ( ! wp_next_scheduled( INNOCODE_WP_RECAPTCHA . '_fetch_ip_lists' ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', INNOCODE_WP_RECAPTCHA . '_fetch_ip_lists' );
+		}
+
+		add_action( INNOCODE_WP_RECAPTCHA . '_fetch_ip_lists', function () {
+			static::refresh_ip_lists();
+		} );
+		$ips = (array) get_option( INNOCODE_WP_RECAPTCHA . '_combined_allowed_ips' );
+		$this->set_allowed_ips( $ips );
+	}
+
+	public static function refresh_ip_lists(){
+
+		$ip_lists = apply_filters( INNOCODE_WP_RECAPTCHA . '_allowed_ip_lists', [
+			'cloudflare' => new CloudFlareIPList(),
+			'constant'   => new ConfigConstantIPList(),
+			'options'    => new OptionsIPList()
+		] );
+		$ips      = [];
+		foreach ( $ip_lists as $ip_list ) {
+			/**
+			 * @var  $ip_list AbstractAllowIPList
+			 */
+			$list_ips = $ip_list->get_allowed_ips();
+			if ( $list_ips ) {
+				$ips = array_unique( array_merge( $ips, $list_ips ) );
+			}
+		}
+		update_option( INNOCODE_WP_RECAPTCHA.'_combined_allowed_ips',$ips );
+
 	}
 
 	/**
@@ -144,9 +163,11 @@ final class Plugin {
 		return $this->_allowed_ips;
 	}
 
-	public function add_allowed_ips( $ips ) {
-		$this->_allowed_ips = array_unique( array_merge( $this->_allowed_ips, $ips ) );
+
+	public function set_allowed_ips(array $ips){
+		$this->_allowed_ips = $ips;
 	}
+
 
 	/**
 	 * @return ReCaptcha
@@ -169,12 +190,6 @@ final class Plugin {
 		return $this->_actions;
 	}
 
-	/**
-	 * @return AbstractAllowIPList[]
-	 */
-	public function get_ip_lists(): array {
-		return $this->_allowed_ip_lists;
-	}
 
 	public function enqueue_scripts() {
 		wp_enqueue_script(

@@ -189,7 +189,7 @@ class Field
         $description = $this->get_description();
 
         if ( $description ) {
-            $html = "<p class=\"description\">$description</p>";
+            $html.= "<p class=\"description\">$description</p>";
         }
 
         return $html;

@@ -79,18 +79,13 @@ class CloudFlareIPList extends AbstractAllowIPList {
 	 * @return array
 	 */
 	protected function _fetch_ips() {
-		$ips       = [];
-		$cache_key = INNOCODE_WP_RECAPTCHA . '_cloudflare_allowed_ips';
+		$ips = [];
 		if ( $this->_is_enabled() ) {
-
-			if ( false === ( $ips = get_transient( $cache_key ) ) ) {
-				$this->_api_init();
-				$this->_collect_list_rules();
-				$this->_collect_ips();
-				if ( $this->_ips ) {
-					$ips = $this->_ips;
-					set_transient( $cache_key, $ips, DAY_IN_SECONDS );
-				}
+			$this->_api_init();
+			$this->_collect_list_rules();
+			$this->_collect_ips();
+			if ( $this->_ips ) {
+				$ips = $this->_ips;
 			}
 		}
 

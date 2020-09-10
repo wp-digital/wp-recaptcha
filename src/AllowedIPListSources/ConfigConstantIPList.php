@@ -14,7 +14,7 @@ class ConfigConstantIPList extends AbstractAllowIPList {
 	public function get_allowed_ips(): array {
 
 		if ( defined( 'INNOCODE_WP_RECAPTCHA_ALLOWED_IPS' ) && INNOCODE_WP_RECAPTCHA_ALLOWED_IPS ) {
-			return array( explode( ",", trim( INNOCODE_WP_RECAPTCHA_ALLOWED_IPS ) ) );
+			return explode( ",", trim( INNOCODE_WP_RECAPTCHA_ALLOWED_IPS ) );
 		}
 
 		return [];
