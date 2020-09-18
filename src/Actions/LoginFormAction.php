@@ -54,7 +54,7 @@ class LoginFormAction extends AbstractAction
     public function get_enqueue_scripts_actions() : array
     {
         $enqueue_scripts_actions = [];
-        $action                  = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'login';
+        $action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'login';
 
         if ( in_array( $action, $this->get_actions() ) ) {
             $enqueue_scripts_actions[] = 'login_enqueue_scripts';
@@ -103,6 +103,7 @@ class LoginFormAction extends AbstractAction
         global $action;
 
         $is_blocked_ip = Helpers::is_ip_blocked( $ip_address );
+
         if ( $response->isSuccess() && ! ( $action == 'login' && $is_blocked_ip ) ) {
             return;
         }
@@ -116,8 +117,8 @@ class LoginFormAction extends AbstractAction
 
                     return;
                 }
-                Helpers::add_blocked_ip( $ip_address );
 
+                Helpers::add_blocked_ip( $ip_address );
                 add_filter( 'authenticate', [ $this, 'retrieve_verification_code' ], 99 );
 
                 return;
@@ -165,10 +166,10 @@ class LoginFormAction extends AbstractAction
             'ids'    => $this->get_forms_ids(),
         ] );
 
-        $selectors        = array_map( function ( string $id ) {
+        $selectors = array_map( function ( string $id ) {
             return "#$id > *";
         }, $this->get_forms_ids() );
-        $selector         = implode( ', ', $selectors );
+        $selector = implode( ', ', $selectors );
         $loading_selector = implode( ', .innocode_recaptcha_loading ', $selectors );
 
         wp_add_inline_style( 'login', "$selector { transition: opacity 0.25s; }
@@ -182,9 +183,10 @@ class LoginFormAction extends AbstractAction
      */
     public function no_js_warning( string $message ) : string
     {
-        $message .= sprintf( "<noscript>
-    <p class=\"message\">%s</p>
-</noscript>\n", __( 'The login form requires JavaScript. Please enable JavaScript in your browser settings.', 'innocode-recaptcha' ) );
+        $message .= sprintf(
+            "<noscript>\n<p class=\"message\">%s</p>\n</noscript>\n",
+            __( 'The login form requires JavaScript. Please enable JavaScript in your browser settings.', 'innocode-recaptcha' )
+        );
 
         return $message;
     }
@@ -266,14 +268,13 @@ class LoginFormAction extends AbstractAction
         $message .= __( 'If this was a mistake, just ignore this email and nothing will happen.', 'innocode-recaptcha' ) . "\r\n\r\n";
         $message .= __( 'To sign in, enter the following verification code into the input field:', 'innocode-recaptcha' ) . "\r\n\r\n";
         $message .= "$code\r\n";
-        $title   = sprintf( __( '[%s] Verification Code', 'innocode-recaptcha' ), $site_name );
-        $title   = apply_filters( 'innocode_recaptcha_retrieve_verification_code_title', $title, $user, 'email' );
+        $title = sprintf( __( '[%s] Verification Code', 'innocode-recaptcha' ), $site_name );
+        $title = apply_filters( 'innocode_recaptcha_retrieve_verification_code_title', $title, $user, 'email' );
         $message = apply_filters( 'innocode_recaptcha_retrieve_verification_code_message', $message, $code, $user, 'email' );
 
         if ( $message && ! wp_mail( $user->user_email, wp_specialchars_decode( $title ), $message ) ) {
             wp_die( __( 'The email could not be sent. Possible reason: your host may have disabled the mail() function.' ) );
         }
-
 
         add_action( 'wp_login_failed', function ( string $username ) use ( $user ) {
             $key = get_password_reset_key( $user );
@@ -313,11 +314,11 @@ class LoginFormAction extends AbstractAction
 
     public function verification_action()
     {
-        $method      = isset( $_REQUEST['method'] ) ? $_REQUEST['method'] : '';
+        $method = isset( $_REQUEST['method'] ) ? $_REQUEST['method'] : '';
         $redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : '';
-        $rp_cookie   = 'wp-resetpass-' . COOKIEHASH;
-        $user        = false;
-        $hash        = '';
+        $rp_cookie = 'wp-resetpass-' . COOKIEHASH;
+        $user = false;
+        $hash = '';
 
         if ( isset( $_COOKIE[ $rp_cookie ] ) && 0 < strpos( $_COOKIE[ $rp_cookie ], ':' ) ) {
             list( $rp_login, $rp_key ) = explode( ':', wp_unslash( $_COOKIE[ $rp_cookie ] ), 2 );
@@ -378,7 +379,7 @@ class LoginFormAction extends AbstractAction
         }
 
         $requested_redirect_to = isset( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : '';
-        $redirect_to           = apply_filters( 'login_redirect', $redirect_to, $requested_redirect_to, $user );
+        $redirect_to = apply_filters( 'login_redirect', $redirect_to, $requested_redirect_to, $user );
 
         if ( $redirect_to ) {
             wp_safe_redirect( $redirect_to );
@@ -461,5 +462,4 @@ class LoginFormAction extends AbstractAction
     {
         Helpers::delete_user_verification_code( $user->ID );
     }
-
 }

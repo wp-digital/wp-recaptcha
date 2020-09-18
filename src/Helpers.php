@@ -27,8 +27,9 @@ class Helpers
     public static function generate_user_verification_code( int $user_id ) : string
     {
         $length = static::get_verification_code_length();
-        $code   = wp_generate_password( $length, false );
+        $code = wp_generate_password( $length, false );
         $hashed = time() . ':' . wp_hash_password( $code );
+
         update_user_meta( $user_id, 'verification_code', $hashed );
 
         return $code;
@@ -39,7 +40,7 @@ class Helpers
      */
     public static function get_verification_code_length() : string
     {
-        return apply_filters( 'innocode_recaptcha_verification_code_length', 6 );
+        return apply_filters( 'innocode_recaptcha_verification_code_length', 12 );
     }
 
     /**
@@ -114,7 +115,8 @@ class Helpers
     public static function enqueue_script( string $handle, array $settings = [] )
     {
         $suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-        $name   = "innocode-recaptcha-$handle";
+        $name = "innocode-recaptcha-$handle";
+
         wp_enqueue_script(
             $name,
             plugins_url( "public/js/$handle$suffix.js", INNOCODE_WP_RECAPTCHA_FILE ),
@@ -146,17 +148,21 @@ class Helpers
     }
 
     /**
-     * @param string $ip_address
+     * @param string $ip
      */
-    public static function add_blocked_ip( string $ip_address )
+    public static function add_blocked_ip( string $ip )
     {
-        //@todo skip blocking allowed ips after merge with allowed ips feature
-        $ip_address = self::filter_ip_address( $ip_address );
-        if ( $ip_address ) {
-            $exist_ips                = self::get_blocked_ips( true );
-            $exist_ips[ $ip_address ] = time();
-            self::set_blocked_ips( $exist_ips );
+        //@TODO: skip blocking allowed ips after merge with allowed ips feature
+        $ip = static::filter_ip( $ip );
+
+        if ( ! $ip ) {
+            return;
         }
+
+        $ips = static::get_blocked_ips( true );
+        $ips[ $ip ] = time();
+
+        static::set_blocked_ips( $ips );
     }
 
     /**
@@ -171,76 +177,81 @@ class Helpers
         } else {
             $ips = get_option( 'innocode_wp_recaptcha_blocked_ips' );
         }
-        $max_time     = time() - self::get_verification_code_lifetime();
-        $filtered_ips = [];
-        if ( $ips ) {
 
-            $filtered_ips = array_filter( $ips, function ( $timestamp ) use ( $max_time ) {
-                return $timestamp > $max_time;
-            } );
-            if ( count( array_keys( $filtered_ips ) ) < count( array_keys( $ips ) ) ) {
-                self::set_blocked_ips( $ips );
-            }
+        if ( empty( $ips ) || ! is_array( $ips ) ) {
+            return [];
         }
 
-        return $filtered_ips ? ( $with_timestamp ? $filtered_ips : array_keys( $filtered_ips ) ) : [];
+        $max_time = time() - static::get_verification_code_lifetime();
+        $filtered_ips = array_filter( $ips, function ( $timestamp ) use ( $max_time ) {
+            return $timestamp > $max_time;
+        } );
+
+        if ( count( array_keys( $filtered_ips ) ) < count( array_keys( $ips ) ) ) {
+            static::set_blocked_ips( $ips );
+        }
+
+        return $with_timestamp ? $filtered_ips : array_keys( $filtered_ips );
     }
 
     /**
-     * @param array $ips_array
+     * @param array $ips
      */
-    public static function set_blocked_ips( array $ips_array )
+    public static function set_blocked_ips( array $ips )
     {
         if ( is_multisite() ) {
-            update_site_option( 'innocode_wp_recaptcha_blocked_ips', $ips_array );
+            update_site_option( 'innocode_wp_recaptcha_blocked_ips', $ips );
         } else {
-            update_option( 'innocode_wp_recaptcha_blocked_ips', $ips_array );
+            update_option( 'innocode_wp_recaptcha_blocked_ips', $ips );
         }
     }
 
     /**
-     * @param string|null $ip_address
+     * @param string|null $ip
      */
-    public static function remove_blocked_ip( string $ip_address = null )
+    public static function remove_blocked_ip( string $ip = null )
     {
-        $ip_address = self::filter_ip_address( $ip_address );
-        if ( $ip_address ) {
-            $exist_ips = self::get_blocked_ips( true );
-            if ( $exist_ips && isset( $exist_ips[ $ip_address ] ) ) {
-                unset( $exist_ips[ $ip_address ] );
-                self::set_blocked_ips( $exist_ips );
+        $ip = static::filter_ip( $ip );
+
+        if ( $ip ) {
+            $ips = static::get_blocked_ips( true );
+
+            if ( $ips && isset( $ips[ $ip ] ) ) {
+                unset( $ips[ $ip ] );
+                static::set_blocked_ips( $ips );
             }
         } else {
-            self::set_blocked_ips( [] );
+            static::set_blocked_ips( [] );
         }
     }
 
     /**
-     * @param string $ip_address
+     * @param string $ip
      *
      * @return bool
      */
-    public static function is_ip_blocked( string $ip_address ) : bool
+    public static function is_ip_blocked( string $ip ) : bool
     {
-        $ip_address = self::filter_ip_address( $ip_address );
-        if ( $ip_address ) {
-            $exist_ips_array = self::get_blocked_ips();
+        $ip = static::filter_ip( $ip );
 
-            return $exist_ips_array && in_array( $ip_address, $exist_ips_array );
+        if ( ! $ip ) {
+            return false;
         }
 
-        return false;
+        $ips = static::get_blocked_ips();
+
+        return in_array( $ip, $ips );
     }
 
     /**
      * Avoiding blocking localhost
      *
-     * @param string $ip_address
+     * @param string $ip
      *
      * @return string
      */
-    public static function filter_ip_address( string $ip_address ) : string
+    public static function filter_ip( string $ip ) : string
     {
-        return $ip_address ? ( $ip_address == '127.0.0.1' ? '' : $ip_address ) : '';
+        return $ip == '127.0.0.1' ? '' : $ip;
     }
 }

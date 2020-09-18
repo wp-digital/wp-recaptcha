@@ -37,7 +37,7 @@ abstract class AbstractAction implements ActionInterface
      * @param string $name
      * @return string
      */
-    public function get_view_file( $name ) : string
+    public function get_view_file( string $name ) : string
     {
         return "{$this->get_views_dir()}/$name";
     }
