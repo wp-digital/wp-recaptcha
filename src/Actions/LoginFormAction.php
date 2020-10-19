@@ -322,6 +322,11 @@ class LoginFormAction extends AbstractAction
 
         if ( isset( $_COOKIE[ $rp_cookie ] ) && 0 < strpos( $_COOKIE[ $rp_cookie ], ':' ) ) {
             list( $rp_login, $rp_key ) = explode( ':', wp_unslash( $_COOKIE[ $rp_cookie ] ), 2 );
+
+            if( is_email( $rp_login ) && $temp_user = get_user_by( 'email', $rp_login ) ) {
+				$rp_login = $temp_user->user_login;
+			}
+
             $user = check_password_reset_key( $rp_key, $rp_login );
 
             if ( ! is_wp_error( $user ) ) {
