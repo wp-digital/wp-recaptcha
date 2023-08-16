@@ -1,52 +1,42 @@
 <?php
 /**
- * Plugin Name: reCAPTCHA
- * Description: Helps to protect website with Google reCAPTCHA v3.
- * Version: 2.3.1
- * Author: Innocode
- * Author URI: https://innocode.com
- * Tested up to: 5.5.1
+ * Plugin Name: Bot Protection
+ * Description: Helps to protect website with Google reCAPTCHA v3 or Cloudflare Turnstile.
+ * Version: 3.0.0
+ * Author: SMFB Dinamo
+ * Author URI: https://smfb-dinamo.com
+ * Tested up to: 6.3.0
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
 
-use Innocode\ReCaptcha;
-
-define( 'INNOCODE_WP_RECAPTCHA_VERSION', '2.3.1' );
-define( 'INNOCODE_WP_RECAPTCHA_FILE', __FILE__ );
+use WPD\Recaptcha;
 
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
-    require_once __DIR__ . '/vendor/autoload.php';
+	require_once __DIR__ . '/vendor/autoload.php';
 }
 
-if ( ! function_exists( 'innocode_recaptcha_init' ) ) {
-    function innocode_recaptcha_init() {
-        /**
-         * @var ReCaptcha\Plugin $innocode_recaptcha
-         */
-        global $innocode_recaptcha;
-
-        $innocode_recaptcha->run();
-    }
-}
-
-if ( defined( 'RECAPTCHA_KEY' ) && defined( 'RECAPTCHA_SECRET' ) ) {
-    $GLOBALS['innocode_recaptcha'] = new ReCaptcha\Plugin();
-
-    add_action( 'init', 'innocode_recaptcha_init' );
-}
-
-if ( ! function_exists( 'innocode_recaptcha' ) ) {
-    function innocode_recaptcha() {
-        /**
-         * @var ReCaptcha\Plugin $innocode_recaptcha
-         */
-        global $innocode_recaptcha;
-
-        if ( is_null( $innocode_recaptcha ) ) {
-            trigger_error( 'Missing required constants RECAPTCHA_KEY and RECAPTCHA_SECRET.', E_USER_ERROR );
-        }
-
-        return $innocode_recaptcha;
-    }
-}
+(
+	new Recaptcha\Plugin(
+		new Recaptcha\Controller(
+			new Recaptcha\Providers\Turnstile(
+				new Recaptcha\Providers\Provider(
+					'0x4AAAAAAADHkXYeqYvm0sNh',
+					'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback'
+				)
+			),
+			new Recaptcha\Validation(
+				'0x4AAAAAAADHkefD1rCVGfBU5G1g2Kp-ecQ',
+				new Recaptcha\HttpClient(
+					new Recaptcha\Url( 'https://challenges.cloudflare.com/turnstile/v0' )
+				),
+				new Vectorface\Whip\Whip()
+			)
+		),
+		new Recaptcha\FormsRepository(
+			new Recaptcha\Forms\Login(),
+			new Recaptcha\Forms\LostPassword(),
+			new Recaptcha\Forms\RetrievePassword()
+		)
+	)
+)->run();
