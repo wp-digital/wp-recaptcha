@@ -27,14 +27,19 @@ interface FormInterface {
 	public function validation_action(): string;
 
 	/**
+	 * @return string[]
+	 */
+	public function allowed_hosts(): array;
+
+	/**
 	 * @param Response $response
 	 * @return void
 	 */
-	public function handle_validated( Response $response ): void;
+	public function success( Response $response ): void;
 
 	/**
 	 * @param \WP_Error $error
 	 * @return void
 	 */
-	public function handle_failed( \WP_Error $error ): void;
+	public function fail( \WP_Error $error ): void;
 }

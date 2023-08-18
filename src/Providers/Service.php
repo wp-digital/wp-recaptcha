@@ -2,6 +2,8 @@
 
 namespace WPD\Recaptcha\Providers;
 
+use WPD\Recaptcha\FormsRepository;
+
 abstract class Service implements ProviderInterface {
 
 	/**
@@ -33,9 +35,10 @@ abstract class Service implements ProviderInterface {
 	}
 
 	/**
+	 * @param FormsRepository $forms_repository
 	 * @return string
 	 */
-	public function js_snippet(): string {
-		return $this->provider->js_snippet();
+	public function js_snippet( FormsRepository $forms_repository ): string {
+		return $this->provider->js_snippet( $forms_repository );
 	}
 }

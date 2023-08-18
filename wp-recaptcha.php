@@ -7,7 +7,7 @@
  * Author URI: https://smfb-dinamo.com
  * Tested up to: 6.3.0
  * License: GPLv2 or later
- * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 use WPD\Recaptcha;
@@ -25,13 +25,15 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 					'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback'
 				)
 			),
+			'0x4AAAAAAADHkefD1rCVGfBU5G1g2Kp-ecQ',
+			new Vectorface\Whip\Whip(),
 			new Recaptcha\Validation(
-				'0x4AAAAAAADHkefD1rCVGfBU5G1g2Kp-ecQ',
 				new Recaptcha\HttpClient(
 					new Recaptcha\Url( 'https://challenges.cloudflare.com/turnstile/v0' )
-				),
-				new Vectorface\Whip\Whip()
-			)
+				)
+			),
+			new Recaptcha\View( plugin_dir_path( __FILE__ ) . 'resources/views' ),
+			900
 		),
 		new Recaptcha\FormsRepository(
 			new Recaptcha\Forms\Login(),

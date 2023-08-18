@@ -2,6 +2,8 @@
 
 namespace WPD\Recaptcha\Providers;
 
+use WPD\Recaptcha\FormsRepository;
+
 interface ProviderInterface {
 
 	/**
@@ -15,7 +17,8 @@ interface ProviderInterface {
 	public function get_script_url(): string;
 
 	/**
+	 * @param FormsRepository $forms_repository
 	 * @return string
 	 */
-	public function js_snippet(): string;
+	public function js_snippet( FormsRepository $forms_repository ): string;
 }

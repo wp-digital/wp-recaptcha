@@ -8,6 +8,20 @@ class Response {
 
 	use Hydrator;
 
+	public const ERROR_MISSING_INPUT_SECRET   = 'missing-input-secret';
+	public const ERROR_INVALID_INPUT_SECRET   = 'invalid-input-secret';
+	public const ERROR_MISSING_INPUT_RESPONSE = 'missing-input-response';
+	public const ERROR_INVALID_INPUT_RESPONSE = 'invalid-input-response';
+	public const ERROR_INVALID_WIDGET_ID      = 'invalid-widget-id';
+	public const ERROR_INVALID_PARSED_SECRET  = 'invalid-parsed-secret';
+	public const ERROR_BAD_REQUEST            = 'bad-request';
+	public const ERROR_TIMEOUT_OR_DUPLICATE   = 'timeout-or-duplicate';
+	public const ERROR_INTERNAL_ERROR         = 'internal-error';
+	public const ERROR_INVALID_ACTION         = 'invalid-action';
+	public const ERROR_INVALID_HOSTNAME       = 'invalid-hostname';
+	public const ERROR_CHALLENGE_EXPIRED      = 'challenge-expired';
+	public const ERROR_SCORE_TOO_LOW          = 'score-too-low';
+
 	/**
 	 * @var array $data
 	 */
@@ -19,7 +33,7 @@ class Response {
 	/**
 	 * @var float|null $score
 	 */
-	protected float $score;
+	protected ?float $score;
 	/**
 	 * @var string $action
 	 */
@@ -49,7 +63,7 @@ class Response {
 		$this->data = $data;
 
 		$this->success      = $data['success'] ?? false;
-		$this->score        = $data['score'] ?? 0;
+		$this->score        = $data['score'] ?? null;
 		$this->action       = $data['action'] ?? '';
 		$this->challenge_ts = new \DateTimeImmutable( $data['challenge_ts'] ?? 'now' );
 		$this->hostname     = $data['hostname'] ?? '';
@@ -65,10 +79,17 @@ class Response {
 	}
 
 	/**
-	 * @return float
+	 * @return float|null
 	 */
-	public function get_score(): float {
+	public function get_score(): ?float {
 		return $this->score;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function score_exits(): bool {
+		return $this->score !== null;
 	}
 
 	/**

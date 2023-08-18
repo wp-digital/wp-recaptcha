@@ -2,6 +2,8 @@
 
 namespace WPD\Recaptcha\Providers;
 
+use WPD\Recaptcha\FormsRepository;
+
 class Turnstile extends Service implements VisibleInterface {
 
 	/**
@@ -14,16 +16,17 @@ HTML;
 	}
 
 	/**
+	 * @param FormsRepository $forms_repository
 	 * @return string
 	 */
-	public function js_snippet(): string {
+	public function js_snippet( FormsRepository $forms_repository ): string {
 		return <<<JS
 window.onloadTurnstileCallback = function () {
-	{$this->provider->js_snippet()}
+	{$this->provider->js_snippet( $forms_repository )}
     document.querySelectorAll('.wpd-recaptcha-turnstile').forEach(function (el) {
         turnstile.render(el, {
             sitekey: '{$this->provider->get_site_key()}',
-            action: '{$form->action()}',
+            action: '{$forms_repository->did_action()}',
 			callback: function (token) {
                 var form = el.closest('form');
 				if (form) {

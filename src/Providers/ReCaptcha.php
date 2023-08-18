@@ -2,12 +2,15 @@
 
 namespace WPD\Recaptcha\Providers;
 
+use WPD\Recaptcha\FormsRepository;
+
 class ReCaptcha extends Service {
 
 	/**
+	 * @param FormsRepository $forms_repository
 	 * @return string
 	 */
-	public function js_snippet(): string {
+	public function js_snippet( FormsRepository $forms_repository ): string {
 		return <<<JS
 (function () {
     if (typeof grecaptcha === 'undefined') {
@@ -23,13 +26,13 @@ class ReCaptcha extends Service {
 			cb();
 		}
 	}
-    {$this->provider->js_snippet()}
+    {$this->provider->js_snippet( $forms_repository )}
 	document.querySelectorAll('form[method="post"]').forEach(function (form) {
 		form.addEventListener('submit', function (event) {
 			event.preventDefault();
 			grecaptcha.ready(function() {
 				grecaptcha.execute('{$this->provider->get_site_key()}', {
-					action: '{$form->action()}'
+					action: '{$forms_repository->did_action()}'
 				}).then(function (token) {
                     recaptchaCallback(form, token);
 					form.submit();

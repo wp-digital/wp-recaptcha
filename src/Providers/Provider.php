@@ -2,6 +2,8 @@
 
 namespace WPD\Recaptcha\Providers;
 
+use WPD\Recaptcha\FormsRepository;
+
 class Provider implements ProviderInterface {
 
 	/**
@@ -42,9 +44,10 @@ class Provider implements ProviderInterface {
 	}
 
 	/**
+	 * @param FormsRepository $forms_repository
 	 * @return string
 	 */
-	public function js_snippet(): string {
+	public function js_snippet( FormsRepository $forms_repository ): string {
 		return <<<JS
 var recaptchaCallback = function (el, token) {
     var input = el.querySelector('[name="wpd-recaptcha-token"]');

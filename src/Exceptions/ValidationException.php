@@ -10,8 +10,8 @@ class ValidationException extends \Exception {
 	protected array $codes = [];
 
 	/**
-	 * @param string   $message
-	 * @param string[] $codes
+	 * @param string          $message
+	 * @param string[]        $codes
 	 * @param \Throwable|null $previous
 	 */
 	public function __construct(

@@ -2,7 +2,12 @@
 
 namespace WPD\Recaptcha;
 
-final class VerificationCode {
+use WPD\Recaptcha\Misc\Hashable;
+use WPD\Recaptcha\Misc\HashGenerator;
+
+final class VerificationCode implements Hashable {
+
+	use HashGenerator;
 
 	/**
 	 * @var int $user_id
@@ -87,6 +92,10 @@ final class VerificationCode {
 			return false;
 		}
 
+		if ( strpos( $hash, ':' ) === false ) {
+			return false;
+		}
+
 		$parts     = explode( ':', $hash );
 		$hash      = $parts[1];
 		$hashed_at = (int) $parts[0];
@@ -95,7 +104,15 @@ final class VerificationCode {
 			return false;
 		}
 
-		return hash_equals( $hash, self::hash( $this->code, $hashed_at, $this->ip_address, $this->user_agent ) );
+		$expected_hash = self::hash(
+			$this->user_id,
+			$this->code,
+			$hashed_at,
+			$this->ip_address,
+			$this->user_agent
+		);
+
+		return hash_equals( $hash, $expected_hash );
 	}
 
 	/**
@@ -103,26 +120,6 @@ final class VerificationCode {
 	 */
 	public function clear(): void {
 		delete_user_meta( $this->user_id, 'wpd_recaptcha_verification_code' );
-	}
-
-	/**
-	 * @return string
-	 */
-	public function to_hash(): string {
-		return self::hash( $this->code, $this->timestamp, $this->ip_address, $this->user_agent );
-	}
-
-	/**
-	 * @param string $code
-	 * @param int    $timestamp
-	 * @param string $ip_address
-	 * @param string $user_agent
-	 * @return string
-	 */
-	public static function hash( string $code, int $timestamp, string $ip_address, string $user_agent ): string {
-		$hash = wp_hash( "$code|$timestamp|$ip_address|$user_agent", 'nonce' );
-
-		return "$timestamp:$hash";
 	}
 
 	/**

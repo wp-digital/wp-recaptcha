@@ -34,9 +34,11 @@ final class FormsRepository {
 	 * @return FormInterface[]
 	 */
 	private function column( string $column ): array {
-		return array_map(
-			fn ( FormInterface $form ) => $form->{$column}(),
-			$this->forms
+		return array_unique(
+			array_map(
+				fn ( FormInterface $form ) => $form->{$column}(),
+				$this->forms
+			)
 		);
 	}
 
@@ -76,6 +78,19 @@ final class FormsRepository {
 		foreach ( $this->forms as $form ) {
 			if ( $form->validation_action() === $action ) {
 				return $form;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function did_action(): ?string {
+		foreach ( $this->forms as $form ) {
+			if ( did_action( $form->action() ) ) {
+				return $form->action();
 			}
 		}
 
