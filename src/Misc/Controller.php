@@ -4,13 +4,20 @@
 // phpcs:disable WPD.Security.NonceVerification.Missing
 // phpcs:disable WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 
-namespace WPD\Recaptcha;
+namespace WPD\Recaptcha\Misc;
 
 use Vectorface\Whip\Whip;
 use WPD\Recaptcha\Exceptions\ValidationException;
+use WPD\Recaptcha\Firewall;
 use WPD\Recaptcha\Forms\ThresholdableInterface;
+use WPD\Recaptcha\FormsRepository;
 use WPD\Recaptcha\Providers\Service;
 use WPD\Recaptcha\Providers\VisibleInterface;
+use WPD\Recaptcha\Request;
+use WPD\Recaptcha\Response;
+use WPD\Recaptcha\Validation;
+use WPD\Recaptcha\VerificationCode;
+use WPD\Recaptcha\View;
 
 final class Controller {
 
@@ -26,6 +33,10 @@ final class Controller {
 	 * @var Whip $whip
 	 */
 	protected Whip $whip;
+	/**
+	 * @var Firewall $firewall
+	 */
+	protected Firewall $firewall;
 	/**
 	 * @var Validation $validation
 	 */
@@ -45,6 +56,7 @@ final class Controller {
 	 * @param Service    $service
 	 * @param string     $secret_key
 	 * @param Whip       $whip
+	 * @param Firewall   $firewall
 	 * @param Validation $validation
 	 * @param View       $view
 	 * @param int        $challenge_ttl
@@ -53,6 +65,7 @@ final class Controller {
 		Service $service,
 		string $secret_key,
 		Whip $whip,
+		Firewall $firewall,
 		Validation $validation,
 		View $view,
 		int $challenge_ttl
@@ -60,6 +73,7 @@ final class Controller {
 		$this->service       = $service;
 		$this->secret_key    = $secret_key;
 		$this->whip          = $whip;
+		$this->firewall      = $firewall;
 		$this->validation    = $validation;
 		$this->view          = $view;
 		$this->challenge_ttl = $challenge_ttl;
@@ -143,9 +157,10 @@ final class Controller {
 			return;
 		}
 
+		$remote_ip = $this->whip->getValidIpAddress();
+
 		try {
-			$request   = new Request( $this->secret_key, $_POST['wpd-recaptcha-token'] );
-			$remote_ip = $this->whip->getValidIpAddress();
+			$request = new Request( $this->secret_key, $_POST['wpd-recaptcha-token'] );
 
 			if ( $remote_ip !== false ) {
 				$request->set_remote_ip( $remote_ip );
@@ -190,6 +205,12 @@ final class Controller {
 					]
 				)
 			);
+
+			return;
+		}
+
+		if ( $remote_ip && $this->firewall->is_allowed( $remote_ip ) ) {
+			$form->success( $response );
 
 			return;
 		}
@@ -493,5 +514,12 @@ final class Controller {
 				return $errors;
 			}
 		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function admin_page(): void {
+		( $this->view )( 'admin-page' );
 	}
 }

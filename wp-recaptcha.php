@@ -18,7 +18,7 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 
 (
 	new Recaptcha\Plugin(
-		new Recaptcha\Controller(
+		new Recaptcha\Misc\Controller(
 			new Recaptcha\Providers\Turnstile(
 				new Recaptcha\Providers\Provider(
 					'0x4AAAAAAADHkXYeqYvm0sNh',
@@ -27,6 +27,12 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 			),
 			'0x4AAAAAAADHkefD1rCVGfBU5G1g2Kp-ecQ',
 			new Vectorface\Whip\Whip(),
+			new Recaptcha\Firewall(
+				new Recaptcha\AllowedLists\Permanent( [
+					'127.0.0.1',
+				] ),
+				new Recaptcha\AllowedLists\Configurable( 'wpd_recaptcha_allowed_ips' )
+			),
 			new Recaptcha\Validation(
 				new Recaptcha\HttpClient(
 					new Recaptcha\Url( 'https://challenges.cloudflare.com/turnstile/v0' )
@@ -39,6 +45,22 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 			new Recaptcha\Forms\Login(),
 			new Recaptcha\Forms\LostPassword(),
 			new Recaptcha\Forms\RetrievePassword()
+		),
+		'wpd_recaptcha',
+		new Recaptcha\Settings(
+			'wpd_recaptcha',
+			new Recaptcha\Setting(
+				'wpd_recaptcha_allowed_ips',
+				__( 'Allowed IPs', 'wpd-recaptcha' ),
+				'sanitize_textarea_field',
+				[
+					'type'        => 'textarea',
+					'class'       => '',
+					'rows'        => 5,
+					'cols'        => 45,
+					'description' => __( 'One IP per line.', 'wpd-recaptcha' )
+				]
+			)
 		)
 	)
 )->run();
