@@ -1,181 +1,108 @@
 <?php
 
-namespace Innocode\ReCaptcha;
+namespace WPD\Recaptcha;
 
-use Innocode\ReCaptcha\Abstracts\AbstractAction;
-use Innocode\ReCaptcha\Actions\LoginFormAction;
-use ReCaptcha\ReCaptcha;
-use Vectorface\Whip\Whip;
+final class Plugin {
 
-/**
- * Class Plugin
- * @package Innocode\ReCaptcha
- */
-final class Plugin
-{
-    /**
-     * @var string
-     */
-    private $_api_script_url = 'https://www.google.com/recaptcha/api.js';
-    /**
-     * @var string
-     */
-    private $_key;
-    /**
-     * @var string
-     */
-    private $_secret;
-    /**
-     * @var ReCaptcha
-     */
-    private $_recaptcha;
-    /**
-     * @var Whip
-     */
-    private $_whip;
-    /**
-     * @var AbstractAction[]
-     */
-    private $_actions = [];
+	/**
+	 * @var Controller $controller
+	 */
+	private Controller $controller;
+	/**
+	 * @var FormsRepository $forms_repository
+	 */
+	private FormsRepository $forms_repository;
+	/**
+	 * @var string $admin_page
+	 */
+	public string $admin_page;
+	/**
+	 * @var Settings $settings
+	 */
+	private Settings $settings;
 
-    /**
-     * Plugin constructor.
-     */
-    public function __construct()
-    {
-        if ( defined( 'RECAPTCHA_API_SCRIPT_URL' ) ) {
-            $this->_api_script_url = RECAPTCHA_API_SCRIPT_URL;
-        }
+	/**
+	 * Plugin constructor.
+	 *
+	 * @param Controller      $controller
+	 * @param FormsRepository $forms_repository
+	 * @param string          $admin_page
+	 * @param Settings        $settings
+	 */
+	public function __construct(
+		Controller $controller,
+		FormsRepository $forms_repository,
+		string $admin_page,
+		Settings $settings
+	) {
+		$this->controller       = $controller;
+		$this->forms_repository = $forms_repository;
+		$this->admin_page       = $admin_page;
+		$this->settings         = $settings;
+	}
 
-        $this->_key = defined( 'RECAPTCHA_KEY' ) ? RECAPTCHA_KEY : '';
-        $this->_secret = defined( 'RECAPTCHA_SECRET' ) ? RECAPTCHA_SECRET : '';
-        $this->_recaptcha = new ReCaptcha( $this->_secret );
-        $this->_whip = new Whip();
+	/**
+	 * @return void
+	 */
+	public function run(): void {
+		$actions = [
+			'no_js_warning'   => $this->forms_repository->no_js_warning_actions(),
+			'token'           => $this->forms_repository->actions(),
+			'enqueue_styles'  => $this->forms_repository->enqueue_styles_actions(),
+			'enqueue_scripts' => $this->forms_repository->enqueue_scripts_actions(),
+			'validate'        => $this->forms_repository->validation_actions(),
+		];
 
-        $this->add_action( 'login', new LoginFormAction() );
-    }
+		foreach ( $actions as $action => $hooks ) {
+			foreach ( $hooks as $hook ) {
+				add_action(
+					$hook,
+					function () use ( $action ): void {
+						$this->controller->{$action}( $this->forms_repository );
+					}
+				);
+			}
+		}
 
-    /**
-     * @param string         $handle
-     * @param AbstractAction $action
-     */
-    public function add_action( string $handle, AbstractAction $action )
-    {
-        $this->_actions[ $handle ] = $action;
-    }
+		add_action( 'wpd_recaptcha_verify', [ $this->controller, 'verify' ] );
+		add_action( 'login_form_wpd_recaptcha_verification', [ $this->controller, 'verification' ] );
+		add_action( 'login_form_login', [ $this->controller, 'verification_errors' ] );
 
-    public function run()
-    {
-        $actions = $this->get_actions();
-        $enqueue_scripts_actions = array_unique(
-            array_reduce(
-                $actions,
-                function ( array $enqueue_scripts_actions, AbstractAction $action ) {
-                    return array_merge( $enqueue_scripts_actions, $action->get_enqueue_scripts_actions() );
-                },
-                []
-            )
-        );
-        $verify_actions = array_unique(
-            array_reduce(
-                $actions,
-                function ( array $verify_actions, AbstractAction $action ) {
-                    return array_merge( $verify_actions, $action->get_verify_actions() );
-                },
-                []
-            )
-        );
+		add_action( 'admin_menu', [ $this, 'admin_page' ] );
+		add_action(
+			'admin_init',
+			function () {
+				$this->settings->register( $this->admin_page );
+			}
+		);
+	}
 
-        foreach ( $enqueue_scripts_actions as $enqueue_scripts_action ) {
-            add_action( $enqueue_scripts_action, [ $this, 'enqueue_scripts' ] );
-        }
+	/**
+	 * @return void
+	 */
+	public function admin_page(): void {
+		add_submenu_page(
+			'options-general.php',
+			esc_html__( 'Bot Protection', 'wpd-recaptcha' ),
+			esc_html__( 'Bot Protection', 'wpd-recaptcha' ),
+			'manage_options',
+			$this->admin_page,
+			[ $this->controller, 'admin_page' ]
+		);
+	}
 
-        foreach ( $verify_actions as $verify_action ) {
-            add_action( $verify_action, [ $this, 'verify' ] );
-        }
+	/**
+	 * @return void
+	 */
+	public function activate(): void {
+    	// Nothing to do here yet.
+	}
 
-        foreach ( $actions as $action ) {
-            $action->init();
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function get_api_script_url() : string
-    {
-        return add_query_arg( 'render', $this->get_key(), $this->_api_script_url );
-    }
-
-    /**
-     * @return string
-     */
-    public function get_key() : string
-    {
-        return $this->_key;
-    }
-
-    /**
-     * @return ReCaptcha
-     */
-    public function get_recaptcha() : ReCaptcha
-    {
-        return $this->_recaptcha;
-    }
-
-    /**
-     * @return Whip
-     */
-    public function get_whip() : Whip
-    {
-        return $this->_whip;
-    }
-
-    /**
-     * @return AbstractAction[]
-     */
-    public function get_actions() : array
-    {
-        return $this->_actions;
-    }
-
-    public function enqueue_scripts()
-    {
-        wp_enqueue_script(
-            'innocode-recaptcha',
-            $this->get_api_script_url(),
-            [],
-            null,
-            true
-        );
-        wp_localize_script(
-            'innocode-recaptcha',
-            'innocodeRecaptcha',
-            [
-                'key' => $this->get_key(),
-            ]
-        );
-    }
-
-    public function verify()
-    {
-        $verify_action = current_action();
-
-        foreach ( $this->get_actions() as $action ) {
-            if (
-                ! in_array( $verify_action, $action->get_verify_actions() ) ||
-                ! $action->can_process()
-            ) {
-                continue;
-            }
-
-            $ip_address = (string) $this->get_whip()->getValidIpAddress();
-            $response = $this->get_recaptcha()
-                ->setExpectedHostname( $action->get_host() )
-                ->setExpectedAction( $action->get_type() )
-                ->setScoreThreshold( $action->get_threshold() )
-                ->verify( $action->get_response(), $ip_address );
-            $action->process( $response, $ip_address );
-        }
-    }
+	/**
+	 * @return void
+	 */
+	public function deactivate(): void {
+		$this->settings->delete();
+		VerificationCode::clear();
+	}
 }
