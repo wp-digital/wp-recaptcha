@@ -2,8 +2,6 @@
 
 namespace WPD\Recaptcha;
 
-use WPD\Recaptcha\Misc\Controller;
-
 final class Plugin {
 
 	/**
@@ -28,7 +26,7 @@ final class Plugin {
 	 *
 	 * @param Controller      $controller
 	 * @param FormsRepository $forms_repository
-	 * @param string		  $admin_page
+	 * @param string          $admin_page
 	 * @param Settings        $settings
 	 */
 	public function __construct(
@@ -50,6 +48,7 @@ final class Plugin {
 		$actions = [
 			'no_js_warning'   => $this->forms_repository->no_js_warning_actions(),
 			'token'           => $this->forms_repository->actions(),
+			'enqueue_styles'  => $this->forms_repository->enqueue_styles_actions(),
 			'enqueue_scripts' => $this->forms_repository->enqueue_scripts_actions(),
 			'validate'        => $this->forms_repository->validation_actions(),
 		];
@@ -70,9 +69,12 @@ final class Plugin {
 		add_action( 'login_form_login', [ $this->controller, 'verification_errors' ] );
 
 		add_action( 'admin_menu', [ $this, 'admin_page' ] );
-		add_action( 'admin_init', function () {
-			$this->settings->register( $this->admin_page );
-		} );
+		add_action(
+			'admin_init',
+			function () {
+				$this->settings->register( $this->admin_page );
+			}
+		);
 	}
 
 	/**
@@ -87,5 +89,20 @@ final class Plugin {
 			$this->admin_page,
 			[ $this->controller, 'admin_page' ]
 		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function activate(): void {
+    	// Nothing to do here yet.
+	}
+
+	/**
+	 * @return void
+	 */
+	public function deactivate(): void {
+		$this->settings->delete();
+		VerificationCode::clear();
 	}
 }

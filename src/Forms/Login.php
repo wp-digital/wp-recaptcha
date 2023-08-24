@@ -4,9 +4,9 @@ namespace WPD\Recaptcha\Forms;
 
 use WPD\Recaptcha\Response;
 
-class Login extends AbstractForm implements ThresholdableInterface {
+class Login extends AbstractForm implements StyledInterface, ThresholdableInterface {
 
-	use AllowedHosts;
+	use AllowedHosts, LoginStyles;
 
 	/**
 	 * @return string
@@ -42,25 +42,6 @@ class Login extends AbstractForm implements ThresholdableInterface {
 	public function threshold(): float {
 		return 0.5;
 	}
-
-	/**
-	 * @TODO: Remove this method before release, it's for testing only!
-	 * @param Response $response
-	 * @return void
-	 */
-//	public function success( Response $response ): void {
-//		parent::success( $response );
-//		add_filter(
-//			'authenticate',
-//			function ( $user ) {
-//				if ( ! ( $user instanceof \WP_User ) ) {
-//					return $user;
-//				}
-//				do_action( 'wpd_recaptcha_verify', $user );
-//			},
-//			100
-//		);
-//	}
 
 	/**
 	 * @param \WP_Error $error
@@ -99,19 +80,12 @@ class Login extends AbstractForm implements ThresholdableInterface {
 					[
 						Response::ERROR_MISSING_INPUT_RESPONSE,
 						Response::ERROR_INVALID_INPUT_RESPONSE,
+						Response::ERROR_SCORE_TOO_LOW,
 					],
 					true
 				) ) {
-					return new \WP_Error(
-						'wpd_recaptcha_bad_response',
-						__(
-							'<strong>ERROR</strong>: JavaScript doesn\'t seem to be enabled.',
-							'wpd-recaptcha'
-						)
-					);
-				}
-
-				if ( in_array(
+					do_action( 'wpd_recaptcha_verify', $user );
+				} elseif ( in_array(
 					$code,
 					[
 						Response::ERROR_TIMEOUT_OR_DUPLICATE,
@@ -123,10 +97,6 @@ class Login extends AbstractForm implements ThresholdableInterface {
 						'wpd_recaptcha_timeout_or_duplicate',
 						__( '<strong>ERROR</strong>: Please try again.', 'wpd-recaptcha' )
 					);
-				}
-
-				if ( $code === Response::ERROR_SCORE_TOO_LOW ) {
-					do_action( 'wpd_recaptcha_verify', $user );
 				}
 
 				return $user;

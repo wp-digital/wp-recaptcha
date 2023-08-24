@@ -4,20 +4,14 @@
 // phpcs:disable WPD.Security.NonceVerification.Missing
 // phpcs:disable WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 
-namespace WPD\Recaptcha\Misc;
+namespace WPD\Recaptcha;
 
 use Vectorface\Whip\Whip;
 use WPD\Recaptcha\Exceptions\ValidationException;
-use WPD\Recaptcha\Firewall;
+use WPD\Recaptcha\Forms\StyledInterface;
 use WPD\Recaptcha\Forms\ThresholdableInterface;
-use WPD\Recaptcha\FormsRepository;
 use WPD\Recaptcha\Providers\Service;
 use WPD\Recaptcha\Providers\VisibleInterface;
-use WPD\Recaptcha\Request;
-use WPD\Recaptcha\Response;
-use WPD\Recaptcha\Validation;
-use WPD\Recaptcha\VerificationCode;
-use WPD\Recaptcha\View;
 
 final class Controller {
 
@@ -108,6 +102,24 @@ final class Controller {
 	 * @param FormsRepository $forms_repository
 	 * @return void
 	 */
+	public function enqueue_styles( FormsRepository $forms_repository ): void {
+		if ( ! ( $this->service instanceof VisibleInterface ) ) {
+			return;
+		}
+
+		$form = $forms_repository->find_by_enqueue_styles_action( current_action() );
+
+		if ( ! ( $form instanceof StyledInterface ) ) {
+			return;
+		}
+
+		$form->enqueue_styles();
+	}
+
+	/**
+	 * @param FormsRepository $forms_repository
+	 * @return void
+	 */
 	public function enqueue_scripts( FormsRepository $forms_repository ): void {
 		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 		wp_enqueue_script(
@@ -119,7 +131,8 @@ final class Controller {
 		);
 		wp_add_inline_script(
 			'wpd-recaptcha',
-			$this->service->js_snippet( $forms_repository )
+			$this->service->js_snippet( $forms_repository ),
+			'before'
 		);
 	}
 
@@ -407,7 +420,7 @@ final class Controller {
 		);
 		$is_valid  = $code->validate( $this->challenge_ttl );
 
-		$code->clear(); // Clear the code, so it can't be used again.
+		$code->delete(); // Clear the code, so it can't be used again.
 
 		if ( ! $is_valid ) {
 			wp_redirect( $failed_redirect );

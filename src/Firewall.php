@@ -14,9 +14,9 @@ final class Firewall {
 	/**
 	 * Firewall constructor.
 	 *
-	 * @param AllowedListInterface ...$allowed_lists
+	 * @param AllowedListInterface[] $allowed_lists
 	 */
-	public function __construct( AllowedListInterface ...$allowed_lists ) {
+	public function __construct( array $allowed_lists ) {
 		$this->allowed_lists = $allowed_lists;
 	}
 

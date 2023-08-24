@@ -118,7 +118,7 @@ final class VerificationCode implements Hashable {
 	/**
 	 * @return void
 	 */
-	public function clear(): void {
+	public function delete(): void {
 		delete_user_meta( $this->user_id, 'wpd_recaptcha_verification_code' );
 	}
 
@@ -127,5 +127,16 @@ final class VerificationCode implements Hashable {
 	 */
 	public function __toString(): string {
 		return $this->code;
+	}
+
+	/**
+	 * @return void
+	 */
+	public static function clear(): void {
+		global $wpdb;
+
+		$wpdb->query(
+			"DELETE FROM $wpdb->usermeta WHERE meta_key = 'wpd_recaptcha_verification_code'"
+		);
 	}
 }

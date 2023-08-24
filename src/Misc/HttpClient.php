@@ -1,6 +1,6 @@
 <?php
 
-namespace WPD\Recaptcha;
+namespace WPD\Recaptcha\Misc;
 
 use WPD\Recaptcha\Exceptions\BadResponseException;
 

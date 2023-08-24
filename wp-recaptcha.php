@@ -10,57 +10,19 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
-use WPD\Recaptcha;
-
-if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
-(
-	new Recaptcha\Plugin(
-		new Recaptcha\Misc\Controller(
-			new Recaptcha\Providers\Turnstile(
-				new Recaptcha\Providers\Provider(
-					'0x4AAAAAAADHkXYeqYvm0sNh',
-					'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback'
-				)
-			),
-			'0x4AAAAAAADHkefD1rCVGfBU5G1g2Kp-ecQ',
-			new Vectorface\Whip\Whip(),
-			new Recaptcha\Firewall(
-				new Recaptcha\AllowedLists\Permanent( [
-					'127.0.0.1',
-				] ),
-				new Recaptcha\AllowedLists\Configurable( 'wpd_recaptcha_allowed_ips' )
-			),
-			new Recaptcha\Validation(
-				new Recaptcha\HttpClient(
-					new Recaptcha\Url( 'https://challenges.cloudflare.com/turnstile/v0' )
-				)
-			),
-			new Recaptcha\View( plugin_dir_path( __FILE__ ) . 'resources/views' ),
-			900
-		),
-		new Recaptcha\FormsRepository(
-			new Recaptcha\Forms\Login(),
-			new Recaptcha\Forms\LostPassword(),
-			new Recaptcha\Forms\RetrievePassword()
-		),
-		'wpd_recaptcha',
-		new Recaptcha\Settings(
-			'wpd_recaptcha',
-			new Recaptcha\Setting(
-				'wpd_recaptcha_allowed_ips',
-				__( 'Allowed IPs', 'wpd-recaptcha' ),
-				'sanitize_textarea_field',
-				[
-					'type'        => 'textarea',
-					'class'       => '',
-					'rows'        => 5,
-					'cols'        => 45,
-					'description' => __( 'One IP per line.', 'wpd-recaptcha' )
-				]
-			)
-		)
+if (
+	(
+		defined( 'WPD_RECAPTCHA_KEY' ) &&
+		defined( 'WPD_RECAPTCHA_SECRET' )
+	) ||
+	(
+		defined( 'RECAPTCHA_KEY' ) &&
+		defined( 'RECAPTCHA_SECRET' )
 	)
-)->run();
+) {
+	WPD\Recaptcha\Bootstrap::init( __FILE__ );
+}

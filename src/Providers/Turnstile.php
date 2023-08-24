@@ -23,16 +23,35 @@ HTML;
 		return <<<JS
 window.onloadTurnstileCallback = function () {
 	{$this->provider->js_snippet( $forms_repository )}
+	var disableSubmit = function (form) {
+		form.querySelectorAll('[type="submit"]').forEach(function (submit) {
+			submit.disabled = true;
+		});
+	};
     document.querySelectorAll('.wpd-recaptcha-turnstile').forEach(function (el) {
+        var form = el.closest('form');
+        var onError = function () {
+			if (form) {
+				disableSubmit(form);
+			}
+		};
+        if (form) {
+            disableSubmit(form);
+        }
         turnstile.render(el, {
             sitekey: '{$this->provider->get_site_key()}',
             action: '{$forms_repository->did_action()}',
+            theme: 'light',
 			callback: function (token) {
-                var form = el.closest('form');
 				if (form) {
                 	recaptchaCallback(el.closest('form'), token);
+                    form.querySelectorAll('[type="submit"]').forEach(function (submit) {
+						submit.disabled = false;
+					});
 				}
 			},
+			"expired-callback": onError,
+            "error-callback": onError
         });
     });
 };

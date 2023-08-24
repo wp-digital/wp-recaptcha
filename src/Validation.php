@@ -3,6 +3,7 @@
 namespace WPD\Recaptcha;
 
 use WPD\Recaptcha\Exceptions\ValidationException;
+use WPD\Recaptcha\Misc\HttpClient;
 
 class Validation {
 

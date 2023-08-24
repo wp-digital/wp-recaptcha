@@ -4,9 +4,9 @@ namespace WPD\Recaptcha\Forms;
 
 use WPD\Recaptcha\Response;
 
-class LostPassword extends AbstractForm {
+class LostPassword extends AbstractForm implements StyledInterface {
 
-	use AllowedHosts;
+	use AllowedHosts, LoginStyles;
 
 	/**
 	 * @return string

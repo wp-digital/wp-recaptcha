@@ -2,6 +2,8 @@
 
 namespace WPD\Recaptcha;
 
+use WPD\Recaptcha\Misc\Setting;
+
 final class Settings {
 
 	/**
@@ -21,7 +23,7 @@ final class Settings {
 	 */
 	public function __construct(
 		string $base_group,
-		Setting ...$settings
+		array $settings
 	) {
 		$this->base_group = $base_group;
 		$this->settings   = $settings;

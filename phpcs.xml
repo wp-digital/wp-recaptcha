@@ -4,7 +4,10 @@
 	<description>Coding standards for developed projects by SMFB+Dinamo.</description>
 
 	<!-- Files or directories to check. -->
+	<file>./resources/view</file>
 	<file>./src</file>
+	<file>./config.php</file>
+	<file>./constants.php</file>
 	<file>./wp-recaptcha.php</file>
 
 	<!-- Path to strip from the front of file paths inside reports (displays shorter paths). -->

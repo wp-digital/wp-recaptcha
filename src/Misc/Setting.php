@@ -1,6 +1,6 @@
 <?php
 
-namespace WPD\Recaptcha;
+namespace WPD\Recaptcha\Misc;
 
 class Setting {
 
@@ -83,7 +83,7 @@ class Setting {
 		foreach ( $attributes as $key => $value ) {
 			if (
 				$key === 'type' && $value === 'textarea'
-	            || $key === 'description'
+				|| $key === 'description'
 			) {
 				continue;
 			}
