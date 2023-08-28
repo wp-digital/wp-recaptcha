@@ -96,8 +96,10 @@ class Setting {
 		}
 
 		printf(
-			$attributes['type'] === 'textarea' ? '<textarea %s>%s</textarea>' : '<input %s value="%s" />',
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			esc_attr( $attributes['type'] ) === 'textarea'
+				? '<textarea %s>%s</textarea>'
+				: '<input %s value="%s" />',
+			// phpcs:ignore WPD.Security.EscapeOutput.OutputNotEscaped
 			rtrim( $attrs ),
 			esc_attr( $this->value() )
 		);

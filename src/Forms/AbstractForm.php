@@ -11,6 +11,12 @@ abstract class AbstractForm implements FormInterface {
 	 * @return void
 	 */
 	public function success( Response $response ): void {
+		/**
+		 * Fires when reCAPTCHA or Turnstile validation is successful.
+		 *
+		 * @param AbstractForm $form
+		 * @param Response     $response
+		 */
 		do_action( 'wpd_recaptcha_form_success', $this, $response );
 	}
 

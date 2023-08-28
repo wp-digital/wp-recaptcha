@@ -2,8 +2,6 @@
 
 namespace WPD\Recaptcha;
 
-use WPD\Recaptcha\AllowedLists\AllowedListInterface;
-
 final class Firewall {
 
 	/**

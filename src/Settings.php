@@ -2,8 +2,6 @@
 
 namespace WPD\Recaptcha;
 
-use WPD\Recaptcha\Misc\Setting;
-
 final class Settings {
 
 	/**

@@ -83,7 +83,7 @@ final class Controller {
 				<p class="message">%s</p>
 			</noscript>
 			HTML,
-			esc_html__( 'Please enable JavaScript in your browser settings to submit this form.', 'wpd-recaptcha' )
+			esc_html__( 'Please enable JavaScript in your browser settings to have better experience.', 'wpd-recaptcha' )
 		);
 	}
 

@@ -84,6 +84,11 @@ class Login extends AbstractForm implements StyledInterface, ThresholdableInterf
 					],
 					true
 				) ) {
+					/**
+					 * Fires when reCAPTCHA or Turnstile response is invalid.
+					 *
+					 * @param \WP_User $user
+					 */
 					do_action( 'wpd_recaptcha_verify', $user );
 				} elseif ( in_array(
 					$code,

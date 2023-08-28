@@ -42,10 +42,12 @@ return [
 		->constructor( DI\get( 'wpd.recaptcha.allowed_ips_option' ) ),
 
 	Recaptcha\Firewall::class                  => DI\autowire()
-		->constructor( [
-			DI\get( Recaptcha\AllowedLists\Permanent::class ),
-			DI\get( Recaptcha\AllowedLists\Configurable::class ),
-		] ),
+		->constructor(
+			[
+				DI\get( Recaptcha\AllowedLists\Permanent::class ),
+				DI\get( Recaptcha\AllowedLists\Configurable::class ),
+			]
+		),
 
 	'WPD\Recaptcha\Validation\Url'             => DI\autowire( Recaptcha\Misc\Url::class )
 		->constructor( DI\get( 'wpd.recaptcha.validation.url' ) ),
@@ -57,17 +59,19 @@ return [
 	Recaptcha\View::class                      => static fn ( DI\Container $container ): Recaptcha\View =>
 	new Recaptcha\View( $container->get( 'wpd.recaptcha.path' ) . 'resources/views' ),
 
-	Recaptcha\Controller::class		           => DI\autowire()
+	Recaptcha\Controller::class                => DI\autowire()
 		->constructorParameter( 'secret_key', DI\get( 'wpd.recaptcha.secret' ) )
 		->constructorParameter( 'whip', DI\get( 'WPD\Recaptcha\Whip' ) )
-	 	->constructorParameter( 'challenge_ttl', DI\get( 'wpd.recaptcha.challenge_ttl' ) ),
+		->constructorParameter( 'challenge_ttl', DI\get( 'wpd.recaptcha.challenge_ttl' ) ),
 
 	Recaptcha\FormsRepository::class           => DI\autowire()
-		->constructor( [
-			DI\get( Recaptcha\Forms\Login::class ),
-			DI\get( Recaptcha\Forms\LostPassword::class ),
-			DI\get( Recaptcha\Forms\RetrievePassword::class ),
-		] ),
+		->constructor(
+			[
+				DI\get( Recaptcha\Forms\Login::class ),
+				DI\get( Recaptcha\Forms\LostPassword::class ),
+				DI\get( Recaptcha\Forms\RetrievePassword::class ),
+			]
+		),
 
 	'Recaptcha\Settings\AllowedIps'            => DI\autowire( Recaptcha\Misc\Setting::class )
 		->constructor(
@@ -91,5 +95,5 @@ return [
 		),
 
 	Recaptcha\Plugin::class                    => DI\autowire()
-		->constructorParameter( 'admin_page', DI\get( 'wpd.recaptcha.admin_page' ) )
+		->constructorParameter( 'admin_page', DI\get( 'wpd.recaptcha.admin_page' ) ),
 ];

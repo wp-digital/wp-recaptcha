@@ -95,7 +95,7 @@ final class Plugin {
 	 * @return void
 	 */
 	public function activate(): void {
-    	// Nothing to do here yet.
+		// Nothing to do here yet.
 	}
 
 	/**

@@ -18,7 +18,6 @@ final class Bootstrap {
 
 	/**
 	 * @throws NotReadableFileException Thrown when the constants.php or config.php file is not readable.
-	 * @throws \Exception               Thrown when the container cannot be built.
 	 */
 	private function __construct() {
 		$constants = __DIR__ . '/../constants.php';
@@ -79,7 +78,12 @@ final class Bootstrap {
 
 		add_action( 'init', [ $plugin, 'run' ] );
 
-		do_action( 'wpd_recaptcha_loaded' );
+		/**
+		 * Fires when the plugin is loaded.
+		 *
+		 * @param Plugin $plugin
+		 */
+		do_action( 'wpd_recaptcha_loaded', $plugin );
 	}
 
 	/**

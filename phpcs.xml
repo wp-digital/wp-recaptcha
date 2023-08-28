@@ -4,7 +4,7 @@
 	<description>Coding standards for developed projects by SMFB+Dinamo.</description>
 
 	<!-- Files or directories to check. -->
-	<file>./resources/view</file>
+	<file>./resources/views</file>
 	<file>./src</file>
 	<file>./config.php</file>
 	<file>./constants.php</file>
