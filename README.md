@@ -159,3 +159,35 @@ add_filter( 'wpd_recaptcha_verification_code_length', function ( int $length ): 
 - `wpd_recaptcha_verify` - Fires when verification is required. Accepts one argument: `WP_User` instance.
 - `wpd_recaptcha_form_success` - Fires when reCAPTCHA or Turnstile validation is successful. Accepts two arguments:
   `WPD\Forms\FormInterface` instance and `WPD\Recaptcha\Response` instance.
+
+### Documentation
+
+Add protection to custom form:
+
+- Create class which implements form interface `WPD\Forms\FormInterface`:
+
+	````
+ 	<?php
+
+ 	use WPD\Forms\FormInterface;
+
+ 	class CustomForm implements FormInterface {
+ 		// @TODO: implement methods
+ 	}
+ 	````
+
+- Add form to `wpd_recaptcha_forms` filter:
+
+	````
+	/**
+	 * @param array $forms
+	 *
+	 * @return array
+	 */
+	add_filter( 'wpd_recaptcha_forms', function ( array $forms ): array {
+		$forms[] = new CustomForm();
+
+		return $forms;
+	} );
+	````
+
