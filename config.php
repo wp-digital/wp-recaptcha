@@ -73,7 +73,7 @@ return [
 			]
 		),
 
-	'Recaptcha\Settings\AllowedIps'            => DI\autowire( Recaptcha\Misc\Setting::class )
+	'WPD\Recaptcha\Settings\AllowedIps'        => DI\autowire( Recaptcha\Misc\Setting::class )
 		->constructor(
 			DI\get( 'wpd.recaptcha.allowed_ips_option' ),
 			__( 'Allowed IPs', 'wpd-recaptcha' ),
@@ -90,7 +90,7 @@ return [
 		->constructor(
 			DI\get( 'wpd.recaptcha.admin_page' ),
 			[
-				DI\get( 'Recaptcha\Settings\AllowedIps' ),
+				DI\get( 'WPD\Recaptcha\Settings\AllowedIps' ),
 			]
 		),
 
