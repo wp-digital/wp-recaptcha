@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Bot Protection
  * Description: Helps to protect website with Google reCAPTCHA v3 or Cloudflare Turnstile.
- * Version: 3.0.2
+ * Version: 3.0.3
  * Author: SMFB Dinamo
  * Author URI: https://smfb-dinamo.com
  * Tested up to: 6.3.0
