@@ -32,7 +32,7 @@ return [
 	Recaptcha\Providers\Service::class         => static fn ( DI\Container $container ): Recaptcha\Providers\Service =>
 	$container->get( 'wpd.recaptcha.type' ) === 'turnstile'
 		? $container->get( Recaptcha\Providers\Turnstile::class )
-		: $container->get( Recaptcha\Providers\Recaptcha::class ),
+		: $container->get( Recaptcha\Providers\ReCaptcha::class ),
 
 	'WPD\Recaptcha\Whip'                       => DI\autowire( Vectorface\Whip\Whip::class ),
 

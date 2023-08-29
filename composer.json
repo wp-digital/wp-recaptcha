@@ -1,6 +1,6 @@
 {
   "name": "wp-digital/wp-recaptcha",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "type": "wordpress-muplugin",
   "description": "Helps to protect website with Google reCAPTCHA v3 or Cloudflare Turnstile.",
   "license": "GPL-2.0+",
